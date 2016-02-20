@@ -16,9 +16,10 @@ public class Game {
     private final int width, height, numberOfMines;
 
     private int[][] board;
-    private int[][] revealed; // -1: not revealed, -2: flagged, X: X adjacent mines
+    private int[][] revealed; // -1: not revealed, -2: flagged, -3: question mark, X: X adjacent mines
 
     private boolean gameOver = false;
+    private boolean gameInitialized;
 
     public final int DEBUG_LEVEL = 0; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
 
@@ -44,7 +45,7 @@ public class Game {
     /**
      * Creates a new game board.
      */
-    private void newGame() {
+    public void newGame() {
         board = new int[width][height];
         revealed = new int[width][height];
         for (int i = 0; i < revealed.length; i++) {
@@ -52,17 +53,20 @@ public class Game {
 
         }
         this.gameOver = false;
+        this.gameInitialized = false;
+    }
 
-        //Place mines
+    public void placeMines(int startx, int starty) {
         int minesPlaced = 0;
         while (minesPlaced < this.numberOfMines) {
             int x = ThreadLocalRandom.current().nextInt(0, width);
             int y = ThreadLocalRandom.current().nextInt(0, height);
-            if (board[x][y] == 0) {
+            if (board[x][y] == 0 && !(x == startx && y == starty)) {
                 board[x][y] = 1;
                 minesPlaced++;
             }
         }
+        gameInitialized = true;
         System.out.println("Mines placed!");
     }
 
@@ -158,6 +162,10 @@ public class Game {
 
     public boolean getGameOver() {
         return gameOver;
+    }
+
+    public boolean gameInitialized() {
+        return gameInitialized;
     }
 
 }

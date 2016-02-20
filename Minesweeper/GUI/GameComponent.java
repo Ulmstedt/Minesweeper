@@ -1,5 +1,6 @@
 package minesweeper.GUI;
 
+import Minesweeper.Game.Constants.ColorList;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -9,7 +10,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -96,7 +96,8 @@ public class GameComponent extends JComponent implements GameListener, MouseList
                         g2d.setColor(new Color(50, 150, 220));
                         g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
                         if (revealed[x][y] != 0) {
-                            g2d.setColor(Color.GREEN);
+                            //g2d.setColor(new Color(revealed[x][y] * 30, 50, 50));
+                            g2d.setColor(ColorList.colors.get(revealed[x][y]));
                             g2d.setFont(new Font("Serif", Font.BOLD, 30));
                             g2d.drawString("" + revealed[x][y], x * Constants.SQUARE_SIZE + Constants.SQUARE_SIZE / 3, y * Constants.SQUARE_SIZE + 3 * Constants.SQUARE_SIZE / 4);
                         }
@@ -132,10 +133,14 @@ public class GameComponent extends JComponent implements GameListener, MouseList
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click
                 game.markBlock(x, y);
             } else { //Left mouse click
+                if (!game.gameInitialized()) {
+                    game.placeMines(x, y);
+
+                }
                 game.revealBlock(x, y);
             }
         } else {
-            game.resetGame();
+            game.newGame();
         }
     }
 

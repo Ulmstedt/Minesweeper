@@ -8,6 +8,10 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import minesweeper.Game.Constants.Constants;
@@ -24,7 +28,10 @@ public class GameComponent extends JComponent implements GameListener, MouseList
     private final Game game;
     final private int width, height;
 
+    BufferedImage mineImage, flagImage, questionmarkImage;
+
     /**
+     * Visually displays a Minesweeper game
      *
      * @param game game that the component should display
      */
@@ -32,6 +39,14 @@ public class GameComponent extends JComponent implements GameListener, MouseList
         this.game = game;
         this.width = Constants.SQUARE_SIZE * game.getWidth() + Constants.LINE_THICKNESS;
         this.height = Constants.SQUARE_SIZE * game.getHeight() + Constants.PADDING_TOP + Constants.LINE_THICKNESS + Constants.PADDING_BOTTOM;
+        try {
+            this.mineImage = ImageIO.read(getClass().getResource("Images/mine3.png"));
+            this.flagImage = ImageIO.read(getClass().getResource("Images/flag.png"));
+            this.questionmarkImage = ImageIO.read(getClass().getResource("Images/questionmark.png"));
+        } catch (IOException e) {
+            System.out.println("Error loading image.");
+            e.printStackTrace();
+        }
         addMouseListener(this);
     }
 
@@ -61,26 +76,33 @@ public class GameComponent extends JComponent implements GameListener, MouseList
 
         int[][] board = game.getBoard();
         int[][] revealed = game.getRevealed();
-        //Draw mines
         for (int x = 0; x < game.getWidth(); x++) {
             for (int y = 0; y < game.getHeight(); y++) {
-                if (board[x][y] == 1) {
-                    g2d.setColor(Color.RED);
-                    g2d.fillOval(x * Constants.SQUARE_SIZE + 7, y * Constants.SQUARE_SIZE + 7, 2 * Constants.SQUARE_SIZE / 3, 2 * Constants.SQUARE_SIZE / 3);
+                //Draw mines (if lost)
+                if (game.getGameOver() == true && board[x][y] == 1) {
+                    g2d.drawImage(mineImage, x * Constants.SQUARE_SIZE + 3, y * Constants.SQUARE_SIZE + 3, Constants.SQUARE_SIZE - 5, Constants.SQUARE_SIZE - 5, null); //Magic numbers are good mkay
                 }
 
-                if (revealed[x][y] == 1) {
-                    g2d.setColor(Color.GREEN);
-                    g2d.fillRect(x * Constants.SQUARE_SIZE + 7, y * Constants.SQUARE_SIZE + 7, 5, 5);
+                if (revealed[x][y] != -1) {
+                    if (revealed[x][y] == -2) {
+                        g2d.drawImage(flagImage, x * Constants.SQUARE_SIZE + 3, y * Constants.SQUARE_SIZE + 3, Constants.SQUARE_SIZE - 5, Constants.SQUARE_SIZE - 5, null); //Magic numbers are good mkay
+                    } else if (revealed[x][y] == -3) {
+                        g2d.drawImage(questionmarkImage, x * Constants.SQUARE_SIZE + 1, y * Constants.SQUARE_SIZE + 1, Constants.SQUARE_SIZE, Constants.SQUARE_SIZE, null); //Magic numbers are good mkay
+                    } else if (revealed[x][y] != 0) {
+                        g2d.setColor(Color.GREEN);
+                        g2d.setFont(new Font("Serif", Font.BOLD, 30));
+                        g2d.drawString("" + revealed[x][y], x * Constants.SQUARE_SIZE + Constants.SQUARE_SIZE / 3, y * Constants.SQUARE_SIZE + 3 * Constants.SQUARE_SIZE / 4);
+                    }
                 }
             }
         }
 
-        if (true != true) {
+        if (game.getGameOver() == true) {
             g2d.setColor(new Color(0f, 0f, 0f, 0.4f));
             g2d.fillRect(0, 0, width, height + Constants.PADDING_TOP + Constants.PADDING_BOTTOM);
             g2d.setFont(new Font("Serif", Font.BOLD, 50));
-            g2d.drawString("Player wins!", width / 2 - 143, height / 2 - 10);
+            g2d.setColor(Color.RED);
+            g2d.drawString("Game over!", width / 2 - 143, height / 2 - 10);
         }
     }
 
@@ -96,12 +118,13 @@ public class GameComponent extends JComponent implements GameListener, MouseList
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (true == true) {
+        if (game.getGameOver() == false) {
+            int x = e.getX() / Constants.SQUARE_SIZE;
+            int y = e.getY() / Constants.SQUARE_SIZE;
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click
-
+                game.markBlock(x, y);
+                System.out.println("Block marked!");
             } else { //Left mouse click
-                int x = e.getX() / Constants.SQUARE_SIZE;
-                int y = e.getY() / Constants.SQUARE_SIZE;
                 game.revealBlock(x, y);
                 System.out.println("Revealed (" + x + ", " + y + ")");
             }

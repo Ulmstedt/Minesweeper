@@ -1,9 +1,11 @@
 package minesweeper.Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
+ * The minesweeper game.
  *
  * @author Sehnsucht
  */
@@ -14,7 +16,9 @@ public class Game {
     private final int width, height, numberOfMines;
 
     private int[][] board;
-    private int[][] revealed; // -1: not revealed, X: X adjacent mines
+    private int[][] revealed; // -1: not revealed, -2: flagged, X: X adjacent mines
+
+    private boolean gameOver = false;
 
     public final int DEBUG_LEVEL = 0; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
 
@@ -23,23 +27,32 @@ public class Game {
         this.width = width;
         this.height = height;
         this.numberOfMines = numberOfMines;
-        if(numberOfMines > width*height){
+        if (numberOfMines > width * height) {
             System.out.println("Too many mines! Terminating.");
             System.exit(0);
         }
         newGame();
     }
 
-    //Update game by 1 tick
+    /**
+     * Update game by 1 tick
+     */
     public void tick() {
-
         notifyListeners();
     }
 
+    /**
+     * Creates a new game board.
+     */
     private void newGame() {
-        this.board = new int[width][height];
-        this.revealed = new int[width][height];
-        
+        board = new int[width][height];
+        revealed = new int[width][height];
+        for (int i = 0; i < revealed.length; i++) {
+            Arrays.fill(revealed[i], -1);
+
+        }
+        this.gameOver = false;
+
         //Place mines
         int minesPlaced = 0;
         while (minesPlaced < this.numberOfMines) {
@@ -52,9 +65,62 @@ public class Game {
         }
         System.out.println("Mines placed!");
     }
-    
-    public void revealBlock(int x, int y){
-        revealed[x][y] = 1;
+
+    /**
+     * Reveal a block and see if there is a mine. If no mine is found, count
+     * adjacent mines and if 0 are found, recursively reveal adjacent blocks as
+     * well.
+     *
+     * @param x x coordinate to reveal
+     * @param y y coordinate to reveal
+     */
+    public void revealBlock(int x, int y) {
+        if (board[x][y] == 1) {
+            gameOver = true;
+            System.out.println("Game over!");
+            return;
+        }
+        int adjacentMines = 0;
+        //Count adjacent mines
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == x && dy == y) {
+                    continue;
+                } else if (board[x + dx][y + dy] == 1) {
+                    adjacentMines++;
+                }
+            }
+        }
+        revealed[x][y] = adjacentMines;
+
+        //Reveal all adjacent blocks if there are no adjacent mines
+        if (adjacentMines == 0) {
+            for (int dx = -1; x <= 1; x++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (dx == x && dy == y) {
+                        continue;
+                    } else {
+                        revealBlock(x + dx, y + dy);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Marks a block with a flag, question mark or unmarks (cycles)
+     *
+     * @param x x to mark
+     * @param y y to mark
+     */
+    public void markBlock(int x, int y) {
+        if (revealed[x][y] == -1) {
+            revealed[x][y] = -2;
+        } else if (revealed[x][y] == -2) {
+            revealed[x][y] = -3;
+        } else if (revealed[x][y] == -3) {
+            revealed[x][y] = -1;
+        }
     }
 
     public void resetGame() {
@@ -83,9 +149,13 @@ public class Game {
     public int[][] getBoard() {
         return this.board;
     }
-    
-    public int[][] getRevealed(){
+
+    public int[][] getRevealed() {
         return revealed;
+    }
+    
+    public boolean getGameOver(){
+        return gameOver;
     }
 
 }

@@ -58,13 +58,24 @@ public class GameComponent extends JComponent implements GameListener, MouseList
         for (int i = 0; i < height; i += Constants.SQUARE_SIZE) {
             g2d.fillRect(0, i + Constants.PADDING_TOP, width, Constants.LINE_THICKNESS);
         }
-        /*
-         for (int x = 0; x < game.getWidth(); x++) {
-         for (int y = 0; y < game.getHeight(); y++) {
 
-         }
-         }
-         */
+        int[][] board = game.getBoard();
+        int[][] revealed = game.getRevealed();
+        //Draw mines
+        for (int x = 0; x < game.getWidth(); x++) {
+            for (int y = 0; y < game.getHeight(); y++) {
+                if (board[x][y] == 1) {
+                    g2d.setColor(Color.RED);
+                    g2d.fillOval(x * Constants.SQUARE_SIZE + 7, y * Constants.SQUARE_SIZE + 7, 2 * Constants.SQUARE_SIZE / 3, 2 * Constants.SQUARE_SIZE / 3);
+                }
+
+                if (revealed[x][y] == 1) {
+                    g2d.setColor(Color.GREEN);
+                    g2d.fillRect(x * Constants.SQUARE_SIZE + 7, y * Constants.SQUARE_SIZE + 7, 5, 5);
+                }
+            }
+        }
+
         if (true != true) {
             g2d.setColor(new Color(0f, 0f, 0f, 0.4f));
             g2d.fillRect(0, 0, width, height + Constants.PADDING_TOP + Constants.PADDING_BOTTOM);
@@ -85,11 +96,14 @@ public class GameComponent extends JComponent implements GameListener, MouseList
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (true != true) {
+        if (true == true) {
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click
 
             } else { //Left mouse click
-
+                int x = e.getX() / Constants.SQUARE_SIZE;
+                int y = e.getY() / Constants.SQUARE_SIZE;
+                game.revealBlock(x, y);
+                System.out.println("Revealed (" + x + ", " + y + ")");
             }
         } else {
             game.resetGame();

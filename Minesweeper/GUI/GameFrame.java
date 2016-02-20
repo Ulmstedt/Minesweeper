@@ -15,7 +15,7 @@ public class GameFrame extends JFrame {
     //JPanel gamePanel;
 
     public GameFrame(Game game) {
-        super("Five in a row");
+        super("Minesweeper");
         this.game = game;
         this.gameComponent = new GameComponent(game);
 

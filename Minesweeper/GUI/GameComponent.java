@@ -86,12 +86,20 @@ public class GameComponent extends JComponent implements GameListener, MouseList
                 if (revealed[x][y] != -1) {
                     if (revealed[x][y] == -2) {
                         g2d.drawImage(flagImage, x * Constants.SQUARE_SIZE + 3, y * Constants.SQUARE_SIZE + 3, Constants.SQUARE_SIZE - 5, Constants.SQUARE_SIZE - 5, null); //Magic numbers are good mkay
+                        System.out.println("asd");
+                        continue;
                     } else if (revealed[x][y] == -3) {
                         g2d.drawImage(questionmarkImage, x * Constants.SQUARE_SIZE + 1, y * Constants.SQUARE_SIZE + 1, Constants.SQUARE_SIZE, Constants.SQUARE_SIZE, null); //Magic numbers are good mkay
-                    } else if (revealed[x][y] != 0) {
-                        g2d.setColor(Color.GREEN);
-                        g2d.setFont(new Font("Serif", Font.BOLD, 30));
-                        g2d.drawString("" + revealed[x][y], x * Constants.SQUARE_SIZE + Constants.SQUARE_SIZE / 3, y * Constants.SQUARE_SIZE + 3 * Constants.SQUARE_SIZE / 4);
+                        continue;
+                    } else {
+                        //Draw other background image for revealed blocks
+                        g2d.setColor(new Color(50, 150, 220));
+                        g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
+                        if (revealed[x][y] != 0) {
+                            g2d.setColor(Color.GREEN);
+                            g2d.setFont(new Font("Serif", Font.BOLD, 30));
+                            g2d.drawString("" + revealed[x][y], x * Constants.SQUARE_SIZE + Constants.SQUARE_SIZE / 3, y * Constants.SQUARE_SIZE + 3 * Constants.SQUARE_SIZE / 4);
+                        }
                     }
                 }
             }
@@ -123,10 +131,8 @@ public class GameComponent extends JComponent implements GameListener, MouseList
             int y = e.getY() / Constants.SQUARE_SIZE;
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click
                 game.markBlock(x, y);
-                System.out.println("Block marked!");
             } else { //Left mouse click
                 game.revealBlock(x, y);
-                System.out.println("Revealed (" + x + ", " + y + ")");
             }
         } else {
             game.resetGame();

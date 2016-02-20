@@ -84,7 +84,7 @@ public class Game {
         //Count adjacent mines
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
-                if (dx == x && dy == y) {
+                if ((dx == x && dy == y) || x + dx < 0 || y + dy < 0 || x + dx >= width || y + dy >= height) {
                     continue;
                 } else if (board[x + dx][y + dy] == 1) {
                     adjacentMines++;
@@ -95,16 +95,17 @@ public class Game {
 
         //Reveal all adjacent blocks if there are no adjacent mines
         if (adjacentMines == 0) {
-            for (int dx = -1; x <= 1; x++) {
+            for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     if (dx == x && dy == y) {
                         continue;
-                    } else {
+                    } else if (!(x + dx < 0 || y + dy < 0 || x + dx >= width || y + dy >= height) && revealed[x + dx][y + dy] < 0) {
                         revealBlock(x + dx, y + dy);
                     }
                 }
             }
         }
+        System.out.println("Revealed (" + x + ", " + y + ")");
     }
 
     /**
@@ -121,6 +122,7 @@ public class Game {
         } else if (revealed[x][y] == -3) {
             revealed[x][y] = -1;
         }
+        System.out.println("Marked (" + x + ", " + y + ")");
     }
 
     public void resetGame() {
@@ -153,8 +155,8 @@ public class Game {
     public int[][] getRevealed() {
         return revealed;
     }
-    
-    public boolean getGameOver(){
+
+    public boolean getGameOver() {
         return gameOver;
     }
 

@@ -16,7 +16,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        final Game game = new Game(30, 16, 99);
+        final Game game = new Game(30, 16, 20); // 30, 16, 99 standard
         new GameFrame(game);
 
         final Action tick = new AbstractAction() {

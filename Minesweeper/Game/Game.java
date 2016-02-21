@@ -211,8 +211,23 @@ public class Game {
         return gameInitialized;
     }
 
+    /**
+     * Returns which block is highlighted (used for mouse hover highlights)
+     *
+     * @return highlighted Point
+     */
     public Point getHighlighted() {
         return highlighted;
+    }
+
+    /**
+     * This function returns how many blocks in total that has been revealed
+     * this game.
+     *
+     * @return how many blocks have been revealed
+     */
+    public int getBlocksRevealed() {
+        return blocksRevealed;
     }
 
 }

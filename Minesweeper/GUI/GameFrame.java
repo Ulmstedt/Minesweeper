@@ -1,6 +1,6 @@
-package minesweeper.GUI;
+package Minesweeper.GUI;
 
-import minesweeper.Game.Game;
+import Minesweeper.Game.Game;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 

@@ -1,4 +1,4 @@
-package minesweeper.GUI;
+package Minesweeper.GUI;
 
 import Minesweeper.Game.GameState;
 import java.awt.Color;
@@ -15,9 +15,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import minesweeper.Game.Constants.Constants;
-import minesweeper.Game.Game;
-import minesweeper.Game.GameListener;
+import Minesweeper.Game.Constants.Constants;
+import Minesweeper.Game.Game;
+import Minesweeper.Game.GameListener;
 
 /**
  * The GameComponent class is a graphical representation of a Game object.

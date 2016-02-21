@@ -1,4 +1,4 @@
-package minesweeper.Game;
+package Minesweeper.Game;
 
 /**
  *

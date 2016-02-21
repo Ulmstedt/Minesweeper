@@ -1,4 +1,4 @@
-package minesweeper.Game.Constants;
+package Minesweeper.Game.Constants;
 
 /**
  *

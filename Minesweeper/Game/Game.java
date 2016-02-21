@@ -1,4 +1,4 @@
-package minesweeper.Game;
+package Minesweeper.Game;
 
 import Minesweeper.Game.GameState;
 import java.awt.Point;

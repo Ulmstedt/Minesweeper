@@ -24,7 +24,7 @@ import minesweeper.Game.GameListener;
  *
  * @author Sehnsucht
  */
-public class GameComponent extends JComponent implements GameListener, MouseListener {
+public class GameComponent extends JComponent implements GameListener, MouseListener, MouseMotionListener {
 
     private final Game game;
     final private int width, height;
@@ -40,16 +40,16 @@ public class GameComponent extends JComponent implements GameListener, MouseList
         this.game = game;
         this.width = Constants.SQUARE_SIZE * game.getWidth() + Constants.LINE_THICKNESS;
         this.height = Constants.SQUARE_SIZE * game.getHeight() + Constants.PADDING_TOP + Constants.LINE_THICKNESS + Constants.PADDING_BOTTOM;
-//        try {
-//            this.mineImage = ImageIO.read(getClass().getResource("Images/mine3.png"));
-//            this.flagImage = ImageIO.read(getClass().getResource("Images/flag.png"));
-//            this.questionmarkImage = ImageIO.read(getClass().getResource("Images/questionmark.png"));
-//        } catch (IOException e) {
-//            System.out.println("Error loading image.");
-//            e.printStackTrace();
-//        }
+        try {
+            this.mineImage = ImageIO.read(getClass().getResource("Images/mine3.png"));
+            this.flagImage = ImageIO.read(getClass().getResource("Images/flag.png"));
+            this.questionmarkImage = ImageIO.read(getClass().getResource("Images/questionmark.png"));
+        } catch (IOException e) {
+            System.out.println("Error loading image.");
+            e.printStackTrace();
+        }
         addMouseListener(this);
-        //addMouseMotionListener(this);
+        addMouseMotionListener(this);
     }
 
     @Override
@@ -81,10 +81,10 @@ public class GameComponent extends JComponent implements GameListener, MouseList
         for (int x = 0; x < game.getWidth(); x++) {
             for (int y = 0; y < game.getHeight(); y++) {
                 //Draw other background color for highlighted block
-//                if (x == game.getHighlighted().x && y == game.getHighlighted().y) {
-//                    g2d.setColor(new Color(50, 150, 220));
-//                    g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
-//                }
+                if (x == game.getHighlighted().x && y == game.getHighlighted().y) {
+                    g2d.setColor(new Color(50, 150, 220));
+                    g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
+                }
                 //Draw mines (if lost)
                 if (game.getGameOver() == true && board[x][y] == 1) {
                     g2d.drawImage(mineImage, x * Constants.SQUARE_SIZE + 3, y * Constants.SQUARE_SIZE + 3, Constants.SQUARE_SIZE - 5, Constants.SQUARE_SIZE - 5, null); //Magic numbers are good mkay
@@ -161,10 +161,9 @@ public class GameComponent extends JComponent implements GameListener, MouseList
     @Override
     public void mouseExited(MouseEvent e) {
     }
-/*
+
     @Override
     public void mouseDragged(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -173,5 +172,5 @@ public class GameComponent extends JComponent implements GameListener, MouseList
         int y = e.getY() / Constants.SQUARE_SIZE;
         game.highlightBlock(x, y);
     }
-*/
+
 }

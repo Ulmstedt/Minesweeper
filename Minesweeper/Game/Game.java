@@ -19,7 +19,7 @@ public class Game {
     private int[][] board;
     private int[][] revealed; // -1: not revealed, -2: flagged, -3: question mark, X: X adjacent mines
 
-//    private Point highlighted;
+    private Point highlighted;
 
     private boolean gameOver = false;
     private boolean gameInitialized;
@@ -31,7 +31,7 @@ public class Game {
         this.width = width;
         this.height = height;
         this.numberOfMines = numberOfMines;
-//        highlighted = new Point();
+        highlighted = new Point();
         if (numberOfMines > width * height) {
             System.out.println("Too many mines! Terminating.");
             System.exit(0);
@@ -62,17 +62,17 @@ public class Game {
 
     public void placeMines(int startx, int starty) {
         int minesPlaced = 0;
-//        outer:
+        outer:
         while (minesPlaced < this.numberOfMines) {
             int x = ThreadLocalRandom.current().nextInt(0, width);
             int y = ThreadLocalRandom.current().nextInt(0, height);
-//            for (int dx = -1; dx <= 1; dx++) {
-//                for (int dy = -1; dy <= 1; dy++) {
-//                    if (x + dx < 0 || y + dy < 0 || x + dx >= width || y + dy >= height || (x + dx == startx && y + dy == starty) || board[x][y] != 0) {
-//                        continue outer;
-//                    }
-//                }
-//            }
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (x + dx < 0 || y + dy < 0 || x + dx >= width || y + dy >= height || (x + dx == startx && y + dy == starty) || board[x][y] != 0) {
+                        continue outer;
+                    }
+                }
+            }
             board[x][y] = 1;
             minesPlaced++;
         }
@@ -139,16 +139,16 @@ public class Game {
         System.out.println("Marked (" + x + ", " + y + ")");
     }
 
-//    public void highlightBlock(int x, int y) {
-//        try {
-//            highlighted.x = x;
-//            highlighted.y = y;
-//        } catch (NullPointerException e) {
-//            //System.out.println("Nullpointer exception.");
-//        }
-//
-//        //System.out.println("highlighted: (" + x + ", " + y + ")");
-//    }
+    public void highlightBlock(int x, int y) {
+        try {
+            highlighted.x = x;
+            highlighted.y = y;
+        } catch (NullPointerException e) {
+            //System.out.println("Nullpointer exception.");
+        }
+
+        //System.out.println("highlighted: (" + x + ", " + y + ")");
+    }
 
     public void addGameListener(GameListener gl) {
         gameListeners.add(gl);
@@ -185,8 +185,8 @@ public class Game {
         return gameInitialized;
     }
 
-//    public Point getHighlighted() {
-//        return highlighted;
-//    }
+    public Point getHighlighted() {
+        return highlighted;
+    }
 
 }

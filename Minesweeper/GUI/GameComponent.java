@@ -1,6 +1,5 @@
 package minesweeper.GUI;
 
-import Minesweeper.Game.Constants.ColorList;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -30,6 +29,17 @@ public class GameComponent extends JComponent implements GameListener, MouseList
     final private int width, height;
 
     BufferedImage mineImage, flagImage, questionmarkImage;
+
+    private Color[] colorList = {
+        Color.BLUE,
+        Color.GREEN,
+        Color.ORANGE,
+        Color.BLACK,
+        Color.RED,
+        Color.CYAN,
+        Color.PINK,
+        Color.magenta
+    };
 
     /**
      * Visually displays a Minesweeper game
@@ -103,7 +113,7 @@ public class GameComponent extends JComponent implements GameListener, MouseList
                         g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
                         if (revealed[x][y] != 0) {
                             //g2d.setColor(new Color(revealed[x][y] * 30, 50, 50));
-                            g2d.setColor(ColorList.colors.get(revealed[x][y]));
+                            g2d.setColor(colorList[revealed[x][y]-1]);
                             g2d.setFont(new Font("Serif", Font.BOLD, 30));
                             g2d.drawString("" + revealed[x][y], x * Constants.SQUARE_SIZE + Constants.SQUARE_SIZE / 3, y * Constants.SQUARE_SIZE + 3 * Constants.SQUARE_SIZE / 4);
                         }

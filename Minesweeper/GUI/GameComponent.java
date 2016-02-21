@@ -1,5 +1,6 @@
 package minesweeper.GUI;
 
+import Minesweeper.Game.GameState;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -96,7 +97,7 @@ public class GameComponent extends JComponent implements GameListener, MouseList
                     g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
                 }
                 //Draw mines (if lost)
-                if (game.getGameOver() == true && board[x][y] == 1) {
+                if (game.getGameState() == GameState.GAMEOVER && board[x][y] == 1) {
                     g2d.drawImage(mineImage, x * Constants.SQUARE_SIZE + 3, y * Constants.SQUARE_SIZE + 3, Constants.SQUARE_SIZE - 5, Constants.SQUARE_SIZE - 5, null); //Magic numbers are good mkay
                 }
 
@@ -113,7 +114,7 @@ public class GameComponent extends JComponent implements GameListener, MouseList
                         g2d.fillRect(x * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, y * Constants.SQUARE_SIZE + Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS, Constants.SQUARE_SIZE - Constants.LINE_THICKNESS);
                         if (revealed[x][y] != 0) {
                             //g2d.setColor(new Color(revealed[x][y] * 30, 50, 50));
-                            g2d.setColor(colorList[revealed[x][y]-1]);
+                            g2d.setColor(colorList[revealed[x][y] - 1]);
                             g2d.setFont(new Font("Serif", Font.BOLD, 30));
                             g2d.drawString("" + revealed[x][y], x * Constants.SQUARE_SIZE + Constants.SQUARE_SIZE / 3, y * Constants.SQUARE_SIZE + 3 * Constants.SQUARE_SIZE / 4);
                         }
@@ -122,12 +123,18 @@ public class GameComponent extends JComponent implements GameListener, MouseList
             }
         }
 
-        if (game.getGameOver() == true) {
+        if (game.getGameState() == GameState.GAMEOVER) {
             g2d.setColor(new Color(0f, 0f, 0f, 0.4f));
             g2d.fillRect(0, 0, width, height + Constants.PADDING_TOP + Constants.PADDING_BOTTOM);
             g2d.setFont(new Font("Serif", Font.BOLD, 50));
             g2d.setColor(Color.RED);
             g2d.drawString("Game over!", width / 2 - 143, height / 2 - 10);
+        } else if (game.getGameState() == GameState.VICTORY) {
+            g2d.setColor(new Color(0f, 0f, 0f, 0.4f));
+            g2d.fillRect(0, 0, width, height + Constants.PADDING_TOP + Constants.PADDING_BOTTOM);
+            g2d.setFont(new Font("Serif", Font.BOLD, 50));
+            g2d.setColor(Color.GREEN);
+            g2d.drawString("Victory!", width / 2 - 143, height / 2 - 10);
         }
     }
 
@@ -143,7 +150,7 @@ public class GameComponent extends JComponent implements GameListener, MouseList
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (game.getGameOver() == false) {
+        if (game.getGameState() == GameState.PLAYING) {
             int x = e.getX() / Constants.SQUARE_SIZE;
             int y = e.getY() / Constants.SQUARE_SIZE;
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click

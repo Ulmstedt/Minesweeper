@@ -1,5 +1,6 @@
 package minesweeper.Game;
 
+import Minesweeper.Game.GameState;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,13 +19,13 @@ public class Game {
 
     private int[][] board;
     private int[][] revealed; // -1: not revealed, -2: flagged, -3: question mark, X: X adjacent mines
+    private int blocksRevealed;
 
     private Point highlighted;
 
-    private boolean gameOver = false;
-    private boolean gameInitialized;
+    private GameState gameState;
 
-    
+    private boolean gameInitialized;
 
     public final int DEBUG_LEVEL = 0; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
 
@@ -54,11 +55,12 @@ public class Game {
     public void newGame() {
         board = new int[width][height];
         revealed = new int[width][height];
+        blocksRevealed = 0;
         for (int i = 0; i < revealed.length; i++) {
             Arrays.fill(revealed[i], -1);
 
         }
-        this.gameOver = false;
+        this.gameState = GameState.PLAYING;
         this.gameInitialized = false;
     }
 
@@ -92,7 +94,7 @@ public class Game {
      */
     public void revealBlock(int x, int y) {
         if (board[x][y] == 1) {
-            gameOver = true;
+            gameState = GameState.GAMEOVER;
             System.out.println("Game over!");
             return;
         }
@@ -108,6 +110,7 @@ public class Game {
             }
         }
         revealed[x][y] = adjacentMines;
+        blocksRevealed++;
 
         //Reveal all adjacent blocks if there are no adjacent mines
         if (adjacentMines == 0) {
@@ -122,6 +125,11 @@ public class Game {
             }
         }
         //System.out.println("Revealed (" + x + ", " + y + ")");
+
+        //Check for victory
+        if (blocksRevealed == (width * height - numberOfMines)) {
+            gameState = GameState.VICTORY;
+        }
     }
 
     /**
@@ -171,16 +179,26 @@ public class Game {
         return height;
     }
 
+    /**
+     * Returns the board if the game is over (for no cheating), otherwise return
+     * null.
+     *
+     * @return game board
+     */
     public int[][] getBoard() {
-        return this.board;
+        if (gameState == GameState.GAMEOVER) {
+            return this.board;
+        } else {
+            return null;
+        }
     }
 
     public int[][] getRevealed() {
         return revealed;
     }
 
-    public boolean getGameOver() {
-        return gameOver;
+    public GameState getGameState() {
+        return gameState;
     }
 
     public boolean gameInitialized() {

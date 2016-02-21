@@ -1,6 +1,5 @@
 package Minesweeper.Game;
 
-import Minesweeper.Game.GameState;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +63,13 @@ public class Game {
         this.gameInitialized = false;
     }
 
+    /**
+     * Randomize board after first click where first clicked block must have 0
+     * adjacent mines.
+     *
+     * @param startx first click x
+     * @param starty first click y
+     */
     public void placeMines(int startx, int starty) {
         int minesPlaced = 0;
         outer:

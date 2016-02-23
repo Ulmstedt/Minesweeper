@@ -200,12 +200,9 @@ public class Game {
     }
 
     public void highlightBlock(int x, int y) {
-        try {
-            highlighted.x = x;
-            highlighted.y = y;
-        } catch (NullPointerException e) {
-            //System.out.println("Nullpointer exception.");
-        }
+
+        highlighted.x = x;
+        highlighted.y = y;
 
         //System.out.println("highlighted: (" + x + ", " + y + ")");
     }
@@ -228,8 +225,8 @@ public class Game {
     public int getHeight() {
         return height;
     }
-    
-    public boolean AIPlaying(){
+
+    public boolean AIPlaying() {
         return AIPlayer != null;
     }
 

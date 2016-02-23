@@ -150,10 +150,7 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (game.AIPlaying()) {
-            return;
-        }
-        if (game.getGameState() == GameState.PLAYING) {
+        if (game.getGameState() == GameState.PLAYING && !game.AIPlaying()) {
             int x = e.getX() / Constants.SQUARE_SIZE;
             int y = e.getY() / Constants.SQUARE_SIZE;
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click

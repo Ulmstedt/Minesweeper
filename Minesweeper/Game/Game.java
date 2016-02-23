@@ -3,6 +3,7 @@ package Minesweeper.Game;
 import Minesweeper.Game.Enums.MoveType;
 import Minesweeper.Game.Interfaces.IAIPlayer;
 import Minesweeper.Game.Interfaces.IGameListener;
+import Minesweeper.Game.Interfaces.IObserver;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ public class Game {
 
     private GameState gameState;
 
+    private final ArrayList<IObserver> gameObservers;
     private IAIPlayer AIPlayer;
 
     private boolean gameInitialized;
@@ -43,6 +45,7 @@ public class Game {
             System.out.println("Too many mines! Terminating.");
             System.exit(0);
         }
+        gameObservers = new ArrayList<>();
         //Set this to AI object if AI is used, otherwise null
         AIPlayer = null;
 
@@ -53,6 +56,9 @@ public class Game {
      * Update game by 1 tick
      */
     public void tick() {
+        if(gameState == GameState.GAMEOVER){
+            //newGame(); //Uncomment for fast AI games
+        }
         Move move;
         if (AIPlayer != null) {
             move = AIPlayer.makeMove();
@@ -127,6 +133,10 @@ public class Game {
     public void revealBlock(int x, int y) {
         if (board[x][y] == 1) {
             gameState = GameState.GAMEOVER;
+            //Notify observers of defeat
+            for (IObserver o : gameObservers) {
+                o.gameEnded(false, blocksRevealed, width * height - numberOfMines - blocksRevealed);
+            }
             System.out.println("Game over!");
             return;
         }
@@ -161,6 +171,10 @@ public class Game {
         //Check for victory
         if (blocksRevealed == (width * height - numberOfMines)) {
             gameState = GameState.VICTORY;
+            //Notify observers of victory
+            for (IObserver o : gameObservers) {
+                o.gameEnded(true, blocksRevealed, width * height - numberOfMines - blocksRevealed);
+            }
         }
     }
 

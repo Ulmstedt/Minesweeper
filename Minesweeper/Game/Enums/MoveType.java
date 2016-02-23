@@ -6,5 +6,8 @@ package Minesweeper.Game.Enums;
  */
 public enum MoveType {
 
-    REVEAL, FLAG, QUESTIONMARK, CLEAR
+    REVEAL, //Reveal block
+    FLAG,  //Flag block (if it is believed to be a bomb)
+    QUESTIONMARK, //Mark block as uncertain
+    CLEAR //Clear flag/questionmark
 }

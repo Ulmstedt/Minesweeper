@@ -1,5 +1,8 @@
 package Minesweeper.Game;
 
+import Minesweeper.Game.Enums.MoveType;
+import Minesweeper.Game.Interfaces.IAIPlayer;
+import Minesweeper.Game.Interfaces.IGameListener;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Game {
 
-    private final ArrayList<GameListener> gameListeners;
+    private final ArrayList<IGameListener> gameListeners;
 
     private final int width, height, numberOfMines;
 
@@ -23,6 +26,8 @@ public class Game {
     private Point highlighted;
 
     private GameState gameState;
+
+    private IAIPlayer AIPlayer;
 
     private boolean gameInitialized;
 
@@ -38,6 +43,9 @@ public class Game {
             System.out.println("Too many mines! Terminating.");
             System.exit(0);
         }
+        //Set this to AI object if AI is used, otherwise null
+        AIPlayer = null;
+
         newGame();
     }
 
@@ -45,6 +53,24 @@ public class Game {
      * Update game by 1 tick
      */
     public void tick() {
+        Move move;
+        if (AIPlayer != null) {
+            move = AIPlayer.makeMove();
+            switch (move.moveType) {
+                case REVEAL:
+                    revealBlock(move.x, move.y);
+                    break;
+                case FLAG:
+                    flagBlock(move.x, move.y);
+                    break;
+                case QUESTIONMARK:
+                    questionBlock(move.x, move.y);
+                    break;
+                case CLEAR:
+                    clearBlock(move.x, move.y);
+                    break;
+            }
+        }
         notifyListeners();
     }
 
@@ -144,7 +170,7 @@ public class Game {
      * @param x x to mark
      * @param y y to mark
      */
-    public void markBlock(int x, int y) {
+    public void markBlockCycle(int x, int y) {
         if (revealed[x][y] == -1) {
             revealed[x][y] = -2;
         } else if (revealed[x][y] == -2) {
@@ -152,7 +178,25 @@ public class Game {
         } else if (revealed[x][y] == -3) {
             revealed[x][y] = -1;
         }
-        System.out.println("Marked (" + x + ", " + y + ")");
+        //System.out.println("Marked (" + x + ", " + y + ")");
+    }
+
+    public void clearBlock(int x, int y) {
+        if (revealed[x][y] < 0) {
+            revealed[x][y] = -1;
+        }
+    }
+
+    public void flagBlock(int x, int y) {
+        if (revealed[x][y] < 0) {
+            revealed[x][y] = -2;
+        }
+    }
+
+    public void questionBlock(int x, int y) {
+        if (revealed[x][y] < 0) {
+            revealed[x][y] = -3;
+        }
     }
 
     public void highlightBlock(int x, int y) {
@@ -166,13 +210,13 @@ public class Game {
         //System.out.println("highlighted: (" + x + ", " + y + ")");
     }
 
-    public void addGameListener(GameListener gl) {
+    public void addGameListener(IGameListener gl) {
         gameListeners.add(gl);
     }
 
     //Notify all listeners that the game has changed
     private void notifyListeners() {
-        for (GameListener gl : gameListeners) {
+        for (IGameListener gl : gameListeners) {
             gl.gameChanged();
         }
     }
@@ -183,6 +227,10 @@ public class Game {
 
     public int getHeight() {
         return height;
+    }
+    
+    public boolean AIPlaying(){
+        return AIPlayer != null;
     }
 
     /**

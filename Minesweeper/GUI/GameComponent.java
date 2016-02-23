@@ -17,14 +17,14 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import Minesweeper.Game.Constants.Constants;
 import Minesweeper.Game.Game;
-import Minesweeper.Game.GameListener;
+import Minesweeper.Game.Interfaces.IGameListener;
 
 /**
  * The GameComponent class is a graphical representation of a Game object.
  *
  * @author Sehnsucht
  */
-public class GameComponent extends JComponent implements GameListener, MouseListener, MouseMotionListener {
+public class GameComponent extends JComponent implements IGameListener, MouseListener, MouseMotionListener {
 
     private final Game game;
     final private int width, height;
@@ -150,11 +150,14 @@ public class GameComponent extends JComponent implements GameListener, MouseList
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (game.AIPlaying()) {
+            return;
+        }
         if (game.getGameState() == GameState.PLAYING) {
             int x = e.getX() / Constants.SQUARE_SIZE;
             int y = e.getY() / Constants.SQUARE_SIZE;
             if (SwingUtilities.isRightMouseButton(e)) { //Right mouse click
-                game.markBlock(x, y);
+                game.markBlockCycle(x, y);
             } else { //Left mouse click
                 if (!game.gameInitialized()) {
                     game.placeMines(x, y);

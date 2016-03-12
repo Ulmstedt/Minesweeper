@@ -135,13 +135,12 @@ public class Loki {
                             // Get available moves for current hash from loki db and add do data if move is available.
                             ArrayList<MoveData> availableMoves = lokiDB.getAvailableMovesFromDB(hash, startX, startY,
                                     searchPatternMirror == 1, searchPatternRotation, searchWidth);
-                            for(MoveData move : availableMoves)
-                            {
-                                if(move.thoughtResult() > 0){
-                                    data.add(move);
+                            for(MoveData md : availableMoves){ // TODO: FIXED
+                                Point move = md.getMove();
+                                if(board[move.y][move.x] == -1 && md.thoughtResult() > 0){
+                                    data.add(md);
                                 }
                             }
-                            //data.addAll(availableMoves.stream().collect(Collectors.toList()));
 
                             startX++;
                             endX++;
@@ -261,7 +260,7 @@ public class Loki {
 
                         existingMoveData.addLosses(md.getLosses());
                         existingMoveData.addWins(md.getWins());
-                    } else {
+                    } else{
                         data.put(move, md);
                     }
                 }
@@ -317,6 +316,13 @@ public class Loki {
         long timeSpent = endTime - startTime;
         Point move = ret.getMove();
         System.out.println("Loki: Move " + move.x + ":" + move.y + " chosen in " + timeSpent + " ms.");
+
+        // TODO: REMOVE DEBUG
+        if(bestThoughtResult == 0 && searchLevelOfResult > 1)
+        {
+            System.out.flush();
+            System.out.println("D");
+        }
 
         return ret;
     }

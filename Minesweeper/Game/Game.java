@@ -33,7 +33,7 @@ public final class Game {
 
     private boolean gameInitialized;
 
-    public final int DEBUG_LEVEL = 0; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
+    public final int DEBUG_LEVEL = 2; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
 
     public Game(int width, int height, int numberOfMines) {
         this.gameListeners = new ArrayList<>();
@@ -313,6 +313,10 @@ public final class Game {
 
     public Stats getStats() {
         return stats;
+    }
+    
+    public IAIPlayer getAIPlayer(){
+        return AIPlayer;
     }
 
 }

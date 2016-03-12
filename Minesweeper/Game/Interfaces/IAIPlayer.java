@@ -8,4 +8,5 @@ import Minesweeper.Game.Move;
  */
 public interface IAIPlayer {
     public Move makeMove();
+    public int[][] getPointGrid();
 }

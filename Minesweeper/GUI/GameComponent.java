@@ -4,10 +4,12 @@ import Minesweeper.Game.Constants.Constants;
 import Minesweeper.Game.Enums.MoveType;
 import Minesweeper.Game.Game;
 import Minesweeper.Game.GameState;
+import Minesweeper.Game.Interfaces.IAIPlayer;
 import Minesweeper.Game.Interfaces.IGameListener;
 import Minesweeper.Game.Interfaces.IObserver;
 import Minesweeper.Game.Move;
 import Minesweeper.Game.Stats;
+import Minesweeper.Game.Utils;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -80,9 +82,27 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Draw background
-        g2d.setColor(new Color(0, 90, 190));
-        g2d.fillRect(0, Constants.PADDING_TOP, game.getWidth() * Constants.SQUARE_SIZE, game.getHeight() * Constants.SQUARE_SIZE);
-
+        IAIPlayer AIPlayer = game.getAIPlayer();
+        if (game.DEBUG_LEVEL >= 1 && AIPlayer != null) {
+            int[][] AIScoreGrid = AIPlayer.getPointGrid();
+            int highestScore = Utils.findHighestScore(AIScoreGrid);
+            //Draw heatmap of bots decision
+            for (int x = 0; x < game.getWidth(); x++) {
+                for (int y = 0; y < game.getHeight(); y++) {
+                    g2d.setColor(new Color((int) (((double) AIScoreGrid[x][y] / (double) highestScore) * 255), 50, 120));
+                    g2d.fillRect(x * Constants.SQUARE_SIZE, y * Constants.SQUARE_SIZE + Constants.PADDING_TOP, Constants.SQUARE_SIZE, Constants.SQUARE_SIZE);
+                    if (game.DEBUG_LEVEL >= 2) {
+                        //Draw AI's  score grid (for debugging)
+                        g2d.setColor(Color.BLACK);
+                        g2d.setFont(new Font("Serif", Font.BOLD, 16));
+                        g2d.drawString("" + AIScoreGrid[x][y], Constants.SQUARE_SIZE / 2 + Constants.SQUARE_SIZE * x + 12, Constants.SQUARE_SIZE / 2 + Constants.SQUARE_SIZE * y + Constants.PADDING_TOP - 6);
+                    }
+                }
+            }
+        } else {
+            g2d.setColor(new Color(0, 90, 190));
+            g2d.fillRect(0, Constants.PADDING_TOP, game.getWidth() * Constants.SQUARE_SIZE, game.getHeight() * Constants.SQUARE_SIZE);
+        }
         //Draw square lines
         g2d.setColor(Color.BLACK);
         for (int i = 0; i < width; i += Constants.SQUARE_SIZE) {

@@ -1,5 +1,7 @@
 package Minesweeper.Game;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,16 +15,40 @@ public class Stats {
 
     private int historyLength, winnersAdded, totalWins, totalLosses;
 
-    private int[] winnerArray;
+    private final int[] winnerArray;
+    private final int[] blocksLeftArray;
 
-    public Stats(int historyLength) {
+    private boolean writeToFile;
+    private int writeFileCounter = 0;
+    private final int WRITE_FILE_FREQ = 50;
+
+    public Stats(int historyLength, boolean writeToFile) {
         this.historyLength = historyLength;
         this.winnersAdded = 0;
+        this.writeToFile = writeToFile;
         winnerArray = new int[historyLength];
+        blocksLeftArray = new int[historyLength];
+    }
+
+    private void writeFile() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("avg-blocks-left-stats.txt", true));
+            writer.write(""+getAverageBlocksLeft());
+            writer.newLine();
+            writer.close();
+        } catch (Exception e) {
+        }
     }
 
     //Winners are added at the back of the array (queue)
-    public void saveWinner(int id) {
+    public void saveWinner(int id, int minesLeft) {
+        if (writeToFile) {
+            writeFileCounter++;
+            if(writeFileCounter == WRITE_FILE_FREQ){
+                writeFileCounter = 0;
+                writeFile();
+            }
+        }
         //Hack for minesweeper (cuz im lazy)
         if (id == 1) {
             totalWins++;
@@ -32,12 +58,12 @@ public class Stats {
         if (winnersAdded < historyLength) {
             winnersAdded++;
         }
-        int[] tempWinnerArray = new int[historyLength];
         for (int i = 0; i < historyLength - 1; i++) {
-            tempWinnerArray[i] = winnerArray[i + 1];
+            winnerArray[i] = winnerArray[i + 1];
+            blocksLeftArray[i] = blocksLeftArray[i + 1];
         }
-        tempWinnerArray[historyLength - 1] = id;
-        winnerArray = tempWinnerArray;
+        winnerArray[historyLength - 1] = id;
+        blocksLeftArray[historyLength - 1] = minesLeft;
     }
 
     public int getTotalWins() {
@@ -81,5 +107,17 @@ public class Stats {
 
     public int getHistoryLength() {
         return historyLength;
+    }
+
+    /**
+     *
+     * @return avg number of blocks left last *history length*
+     */
+    public double getAverageBlocksLeft() {
+        int sum = 0;
+        for (int i = 0; i < historyLength; i++) {
+            sum += blocksLeftArray[i];
+        }
+        return (double) sum / historyLength;
     }
 }

@@ -172,7 +172,9 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
         String recentWinString = "Wins: " + recentWins + " (" + recentWinPercentString + "%)";
         String recentLossString = "Losses: " + recentLosses + " (" + recentLossPercentString + "%)";
 
-        g2d.drawString("Total:  " + winStringTotal + " / " + lossStringTotal + "  |  Last " + stats.getHistoryLength() + " games:  " + recentWinString + " / " + recentLossString, 3, height - 5);
+        String avgMinesLeftString = "Avg blocks left: " + String.format("%.1f", stats.getAverageBlocksLeft());
+
+        g2d.drawString("Total:  " + winStringTotal + " / " + lossStringTotal + "  |  Last " + stats.getHistoryLength() + " games:  " + recentWinString + " / " + recentLossString + ", " + avgMinesLeftString, 3, height - 5);
 
         if (game.getGameState() == GameState.GAMEOVER) {
             g2d.setColor(new Color(0f, 0f, 0f, 0.4f));

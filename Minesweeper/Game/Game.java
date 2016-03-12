@@ -34,6 +34,7 @@ public final class Game {
     private boolean gameInitialized;
 
     public final int DEBUG_LEVEL = 2; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
+    public final boolean FILE_STATS = true;
 
     public Game(int width, int height, int numberOfMines) {
         this.gameListeners = new ArrayList<>();
@@ -46,7 +47,7 @@ public final class Game {
             System.exit(0);
         }
         gameObservers = new ArrayList<>();
-        this.stats = new Stats(50);
+        this.stats = new Stats(50, FILE_STATS);
         //Set this to AI object if AI is used, otherwise null
         AIPlayer = new TestAI(this);
 
@@ -58,14 +59,13 @@ public final class Game {
      */
     public void tick() {
         if (gameState == GameState.GAMEOVER) {
-            //newGame(); //Uncomment for fast AI games
+            newGame(); //Uncomment for fast AI games
         } else if (gameState == GameState.VICTORY) {
-            //newGame(); //Uncomment for fast AI games
+            newGame(); //Uncomment for fast AI games
         }
         Move move;
         if (AIPlayer != null && gameState == GameState.PLAYING) {
             move = AIPlayer.makeMove();
-            System.out.println("Move: (" + move.x + ", " + move.y + ")");
             switch (move.moveType) {
                 case REVEAL:
                     if (!gameInitialized) {
@@ -148,7 +148,7 @@ public final class Game {
             for (IObserver o : gameObservers) {
                 o.gameEnded(false, blocksRevealed, width * height - numberOfMines - blocksRevealed);
             }
-            stats.saveWinner(2);
+            stats.saveWinner(2, width * height - numberOfMines - blocksRevealed);
             System.out.println("Game over!");
             return;
         }
@@ -183,7 +183,7 @@ public final class Game {
         //Check for victory
         if (blocksRevealed == (width * height - numberOfMines) && gameState != GameState.VICTORY) {
             gameState = GameState.VICTORY;
-            stats.saveWinner(1);
+            stats.saveWinner(1, width * height - numberOfMines - blocksRevealed);
             //Notify observers of victory
             for (IObserver o : gameObservers) {
                 o.gameEnded(true, blocksRevealed, width * height - numberOfMines - blocksRevealed);
@@ -314,8 +314,8 @@ public final class Game {
     public Stats getStats() {
         return stats;
     }
-    
-    public IAIPlayer getAIPlayer(){
+
+    public IAIPlayer getAIPlayer() {
         return AIPlayer;
     }
 

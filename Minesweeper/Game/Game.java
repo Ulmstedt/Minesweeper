@@ -36,6 +36,10 @@ public final class Game {
     public final int DEBUG_LEVEL = 2; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
     public final boolean FILE_STATS = false;
 
+    public final boolean REUSE_BOARD = true;
+    private int[][] lastBoard;
+    private boolean lastBoardBeat = true;
+
     public Game(int width, int height, int numberOfMines) {
         this.gameListeners = new ArrayList<>();
         this.width = width;
@@ -115,23 +119,34 @@ public final class Game {
      * @param starty first click y
      */
     public void placeMines(int startx, int starty) {
-        int minesPlaced = 0;
-        outer:
-        while (minesPlaced < this.numberOfMines) {
-            int x = ThreadLocalRandom.current().nextInt(0, width);
-            int y = ThreadLocalRandom.current().nextInt(0, height);
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    if ((x + dx == startx && y + dy == starty) || board[x][y] != 0) {
-                        continue outer;
+        //Reuse last board
+        if (REUSE_BOARD && !lastBoardBeat) {
+            board = Utils.cloneMatrix(lastBoard);
+            gameInitialized = true;
+        } else { //Randomize new board
+            int minesPlaced = 0;
+            outer:
+            while (minesPlaced < this.numberOfMines) {
+                int x = ThreadLocalRandom.current().nextInt(0, width);
+                int y = ThreadLocalRandom.current().nextInt(0, height);
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        if ((x + dx == startx && y + dy == starty) || board[x][y] != 0) {
+                            continue outer;
+                        }
                     }
                 }
+                board[x][y] = 1;
+                minesPlaced++;
             }
-            board[x][y] = 1;
-            minesPlaced++;
+            gameInitialized = true;
+            if (REUSE_BOARD) {
+                lastBoard = Utils.cloneMatrix(board);
+                lastBoardBeat = false;
+            }
+
+            System.out.println("Mines placed!");
         }
-        gameInitialized = true;
-        System.out.println("Mines placed!");
     }
 
     /**
@@ -185,6 +200,9 @@ public final class Game {
         if (blocksRevealed == (width * height - numberOfMines) && gameState != GameState.VICTORY) {
             gameState = GameState.VICTORY;
             stats.saveWinner(1, width * height - numberOfMines - blocksRevealed);
+            if (REUSE_BOARD) {
+                lastBoardBeat = true;
+            }
             //Notify observers of victory
             for (IObserver o : gameObservers) {
                 o.gameEnded(true, blocksRevealed, width * height - numberOfMines - blocksRevealed);

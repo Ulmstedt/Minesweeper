@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author Sehnsucht
  */
-public class Game {
+public final class Game {
 
     private final ArrayList<IGameListener> gameListeners;
 
@@ -23,7 +23,7 @@ public class Game {
     private int[][] revealed; // -1: not revealed, -2: flagged, -3: question mark, X: X adjacent mines
     private int blocksRevealed;
 
-    private Point highlighted;
+    private final Point highlighted;
 
     private GameState gameState;
 
@@ -46,7 +46,7 @@ public class Game {
         }
         gameObservers = new ArrayList<>();
         //Set this to AI object if AI is used, otherwise null
-        AIPlayer = null;
+        AIPlayer = new TestAI(this);
 
         newGame();
     }
@@ -61,8 +61,12 @@ public class Game {
         Move move;
         if (AIPlayer != null) {
             move = AIPlayer.makeMove();
+            System.out.println("Move: (" + move.x + ", " + move.y + ")");
             switch (move.moveType) {
                 case REVEAL:
+                    if (!gameInitialized) {
+                        placeMines(move.x, move.y);
+                    }
                     revealBlock(move.x, move.y);
                     break;
                 case FLAG:
@@ -134,6 +138,7 @@ public class Game {
      * @param y y coordinate to reveal
      */
     public void revealBlock(int x, int y) {
+        System.out.println("Reveal (" + x + ", " + y + ")");
         if (board[x][y] == 1) {
             gameState = GameState.GAMEOVER;
             //Notify observers of defeat
@@ -154,6 +159,7 @@ public class Game {
                 }
             }
         }
+        System.out.println("Mines: " + revealed[x][y]);
         revealed[x][y] = adjacentMines;
         blocksRevealed++;
 
@@ -182,7 +188,7 @@ public class Game {
     }
 
     /**
-     * Marks a block with a flag, question mark or unmarks (cycles)
+     * Marks a block with a flag, question mark or un marks (cycles)
      *
      * @param x x to mark
      * @param y y to mark
@@ -294,6 +300,7 @@ public class Game {
 
     /**
      * Get list of observers
+     *
      * @return observer list
      */
     public ArrayList<IObserver> getGameObservers() {

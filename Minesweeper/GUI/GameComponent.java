@@ -35,7 +35,7 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
 
     BufferedImage mineImage, flagImage, questionmarkImage;
 
-    private Color[] colorList = {
+    private final Color[] colorList = {
         Color.BLUE,
         Color.GREEN,
         Color.ORANGE,

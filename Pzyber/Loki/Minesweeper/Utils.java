@@ -47,8 +47,8 @@ public class Utils {
     }
 
     public static int[][] changeToYXBoard(int[][] board) {
-        int width = board[0].length;
-        int height = board.length;
+        int width = board.length; // TODO: CHANGED
+        int height = board[0].length; // TODO: CHANGED
 
         int[][] fixedBoard = new int[height][width];
 
@@ -128,6 +128,8 @@ public class Utils {
                 newBoard[y][x] = -1;
             }
         }
+
+        return newBoard;
     }
 
     public static Point mirrorMoveVertically(Point move, int size) {

@@ -172,7 +172,7 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
         String recentWinString = "Wins: " + recentWins + " (" + recentWinPercentString + "%)";
         String recentLossString = "Losses: " + recentLosses + " (" + recentLossPercentString + "%)";
 
-        String avgMinesLeftString = "Avg blocks left: " + String.format("%.1f", stats.getAverageMinesLeft());
+        String avgMinesLeftString = "Avg blocks left: " + String.format("%.1f", stats.getAverageBlocksLeft());
 
         g2d.drawString("Total:  " + winStringTotal + " / " + lossStringTotal + "  |  Last " + stats.getHistoryLength() + " games:  " + recentWinString + " / " + recentLossString + ", " + avgMinesLeftString, 3, height - 5);
 

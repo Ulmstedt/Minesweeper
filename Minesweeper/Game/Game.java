@@ -34,6 +34,7 @@ public final class Game {
     private boolean gameInitialized;
 
     public final int DEBUG_LEVEL = 2; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
+    public final boolean FILE_STATS = true;
 
     public Game(int width, int height, int numberOfMines) {
         this.gameListeners = new ArrayList<>();
@@ -46,7 +47,7 @@ public final class Game {
             System.exit(0);
         }
         gameObservers = new ArrayList<>();
-        this.stats = new Stats(50);
+        this.stats = new Stats(50, FILE_STATS);
         //Set this to AI object if AI is used, otherwise null
         AIPlayer = new TestAI(this);
 

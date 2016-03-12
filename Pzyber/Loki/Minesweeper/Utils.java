@@ -46,10 +46,12 @@ public class Utils {
         }
     }
 
+    // TODO: CHANGED
     public static int[][] changeToYXBoard(int[][] board) {
-        int width = board.length; // TODO: CHANGED
-        int height = board[0].length; // TODO: CHANGED
+        int width = board.length;
+        int height = board[0].length;
 
+        // Revert size;
         int[][] fixedBoard = new int[height][width];
 
         for (int y = 0; y < height; y++) {
@@ -95,36 +97,27 @@ public class Utils {
         return result;
     }
 
-    public static Point getMoveByBoardComparison(int[][] previous, int[][] current) {
-        for (int y = 0; y < current.length; y++) {
-            for (int x = 0; x < current[0].length; x++) {
-                if (current[y][x] > previous[y][x]) {
-                    return new Point(x, y);
-                }
-            }
-        }
-        return null;
-    }
-
-    public static boolean hasAdjecentMoveOrFullSize(int[][] board, int startX, int startY, int endX, int endY) {
-        if (startX == 0 && startY == 0 && endX == board[0].length - 1 && endY == board.length - 1) {
+    public static boolean hasAdjecentMoveOrFullSize(int[][] board, int size, int startX, int startY, int endX, int endY) {
+        if (startX == 0 && startY == 0 && endX == (size - 1) && endY == (size - 1)) { // TODO: CHANGED
             return true;
         }
 
-        int value = 0;
         for (int y = startY; y <= endY; y++) {
             for (int x = startX; x <= endX; x++) {
-                value += board[y][x];
+                if(board[y][x] > -1) {
+                    return true;
+                }
             }
         }
-        return value > 0;
+
+        return false;
     }
 
     public static int[][] initNewBoard(int width, int height){
-        int[][] newBoard = new int[width][height];
+        int[][] newBoard = new int[height][width];
 
-        for (int y = 0; y < width; y++) {
-            for (int x = 0; x < height; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 newBoard[y][x] = -1;
             }
         }

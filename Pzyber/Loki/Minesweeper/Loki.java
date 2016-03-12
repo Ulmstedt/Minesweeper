@@ -36,8 +36,13 @@ public class Loki {
     private Random random = new Random();
 
     // Memory DB.
-    public Loki(int width, int height) {
-        size = width <= height ? width : height;
+    public Loki(int width, int height, int searchWidth) {
+        if(size <= width && size <= height) {
+            size = searchWidth;
+        }
+        else {
+            size = width <= height ? width : height;
+        }
         this.width = width;
         this.height = height;
         previousBoard = Utils.initNewBoard(width, height);
@@ -46,8 +51,13 @@ public class Loki {
     }
 
     // Folder DB.
-    public Loki(String folderPath, int width, int height) {
-        size = width <= height ? width : height;
+    public Loki(String folderPath, int width, int height, int searchWidth) {
+        if(size <= width && size <= height) {
+            size = searchWidth;
+        }
+        else {
+            size = width <= height ? width : height;
+        }
         this.width = width;
         this.height = height;
         previousBoard = Utils.initNewBoard(width, height);
@@ -60,8 +70,13 @@ public class Loki {
     }
 
     // File DB.
-    public Loki(String folderPath, String filename, int width, int height) {
-        size = width <= height ? width : height;
+    public Loki(String folderPath, String filename, int width, int height, int searchWidth) {
+        if(size <= width && size <= height) {
+            size = searchWidth;
+        }
+        else {
+            size = width <= height ? width : height;
+        }
         this.width = width;
         this.height = height;
         previousBoard = Utils.initNewBoard(width, height);
@@ -75,8 +90,13 @@ public class Loki {
 
     // SQL DB.
     public Loki(InetAddress address, int port, String database, String username, String password, int width,
-                int height) {
-        size = width <= height ? width : height;
+                int height, int searchWidth) {
+        if(size <= width && size <= height) {
+            size = searchWidth;
+        }
+        else {
+            size = width <= height ? width : height;
+        }
         this.width = width;
         this.height = height;
         previousBoard = Utils.initNewBoard(width, height);
@@ -117,7 +137,7 @@ public class Loki {
                                     searchPatternMirror == 1, searchPatternRotation, searchWidth);
                             for(MoveData move : availableMoves)
                             {
-                                if(move.thoughtResult() >= 0.5){
+                                if(move.thoughtResult() > 0){
                                     data.add(move);
                                 }
                             }
@@ -161,7 +181,7 @@ public class Loki {
         int endY = searchWidth - 1;
         while (endY < height) {
             while (endX < width) {
-                if (Utils.hasAdjecentMoveOrFullSize(board, startX, startY, endX, endY) &&
+                if (Utils.hasAdjecentMoveOrFullSize(board, size, startX, startY, endX, endY) &&
                         move.x >= startX && move.x <= endX && move.y >= startY && move.y <= endY) {
                     // Get search pattern and calculate hash.
                     int[][] searchPattern = Utils.getSearchPattern(board, startX, startY, endX, endY);
@@ -195,7 +215,7 @@ public class Loki {
         for (GameData gd : gameData) {
             int searchWidth = size;
             while (searchWidth > 1) {
-                storeMovesInDB(gd, win, searchWidth);
+                storeMovesInDB(gd, gd.equals(gameData.get(gameData.size() - 1)) ? win : true, searchWidth);
 
                 searchWidth--;
             }

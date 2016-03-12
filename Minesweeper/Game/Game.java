@@ -55,7 +55,7 @@ public class Game {
      * Update game by 1 tick
      */
     public void tick() {
-        if(gameState == GameState.GAMEOVER){
+        if (gameState == GameState.GAMEOVER) {
             //newGame(); //Uncomment for fast AI games
         }
         Move move;
@@ -74,6 +74,10 @@ public class Game {
                 case CLEAR:
                     clearBlock(move.x, move.y);
                     break;
+            }
+            //Notify observers of the move
+            for (IObserver o : gameObservers) {
+                o.moveMade(move);
             }
         }
         notifyListeners();
@@ -286,6 +290,14 @@ public class Game {
      */
     public int getBlocksRevealed() {
         return blocksRevealed;
+    }
+
+    /**
+     * Get list of observers
+     * @return observer list
+     */
+    public ArrayList<IObserver> getGameObservers() {
+        return gameObservers;
     }
 
 }

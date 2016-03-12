@@ -13,16 +13,18 @@ public class Stats {
 
     private int historyLength, winnersAdded, totalWins, totalLosses;
 
-    private int[] winnerArray;
+    private final int[] winnerArray;
+    private final int[] blocksLeftArray;
 
     public Stats(int historyLength) {
         this.historyLength = historyLength;
         this.winnersAdded = 0;
         winnerArray = new int[historyLength];
+        blocksLeftArray = new int[historyLength];
     }
 
     //Winners are added at the back of the array (queue)
-    public void saveWinner(int id) {
+    public void saveWinner(int id, int minesLeft) {
         //Hack for minesweeper (cuz im lazy)
         if (id == 1) {
             totalWins++;
@@ -32,12 +34,12 @@ public class Stats {
         if (winnersAdded < historyLength) {
             winnersAdded++;
         }
-        int[] tempWinnerArray = new int[historyLength];
         for (int i = 0; i < historyLength - 1; i++) {
-            tempWinnerArray[i] = winnerArray[i + 1];
+            winnerArray[i] = winnerArray[i + 1];
+            blocksLeftArray[i] = blocksLeftArray[i + 1];
         }
-        tempWinnerArray[historyLength - 1] = id;
-        winnerArray = tempWinnerArray;
+        winnerArray[historyLength - 1] = id;
+        blocksLeftArray[historyLength - 1] = minesLeft;
     }
 
     public int getTotalWins() {
@@ -81,5 +83,17 @@ public class Stats {
 
     public int getHistoryLength() {
         return historyLength;
+    }
+    
+    /**
+     * 
+     * @return avg number of blocks left last *history length*
+     */
+    public double getAverageMinesLeft(){
+        int sum = 0;
+        for (int i = 0; i < historyLength; i++) {
+            sum += blocksLeftArray[i];
+        }
+        return (double)sum/historyLength;
     }
 }

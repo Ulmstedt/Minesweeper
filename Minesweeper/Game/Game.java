@@ -58,14 +58,13 @@ public final class Game {
      */
     public void tick() {
         if (gameState == GameState.GAMEOVER) {
-            //newGame(); //Uncomment for fast AI games
+            newGame(); //Uncomment for fast AI games
         } else if (gameState == GameState.VICTORY) {
-            //newGame(); //Uncomment for fast AI games
+            newGame(); //Uncomment for fast AI games
         }
         Move move;
         if (AIPlayer != null && gameState == GameState.PLAYING) {
             move = AIPlayer.makeMove();
-            System.out.println("Move: (" + move.x + ", " + move.y + ")");
             switch (move.moveType) {
                 case REVEAL:
                     if (!gameInitialized) {
@@ -148,7 +147,7 @@ public final class Game {
             for (IObserver o : gameObservers) {
                 o.gameEnded(false, blocksRevealed, width * height - numberOfMines - blocksRevealed);
             }
-            stats.saveWinner(2);
+            stats.saveWinner(2, width * height - numberOfMines - blocksRevealed);
             System.out.println("Game over!");
             return;
         }
@@ -183,7 +182,7 @@ public final class Game {
         //Check for victory
         if (blocksRevealed == (width * height - numberOfMines) && gameState != GameState.VICTORY) {
             gameState = GameState.VICTORY;
-            stats.saveWinner(1);
+            stats.saveWinner(1, width * height - numberOfMines - blocksRevealed);
             //Notify observers of victory
             for (IObserver o : gameObservers) {
                 o.gameEnded(true, blocksRevealed, width * height - numberOfMines - blocksRevealed);
@@ -314,8 +313,8 @@ public final class Game {
     public Stats getStats() {
         return stats;
     }
-    
-    public IAIPlayer getAIPlayer(){
+
+    public IAIPlayer getAIPlayer() {
         return AIPlayer;
     }
 

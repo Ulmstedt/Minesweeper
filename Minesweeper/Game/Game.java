@@ -58,10 +58,10 @@ public final class Game {
      */
     public void tick() {
         if (gameState == GameState.GAMEOVER) {
-            newGame(); //Uncomment for fast AI games
+            //newGame(); //Uncomment for fast AI games
         }
         Move move;
-        if (AIPlayer != null) {
+        if (AIPlayer != null && gameState == GameState.PLAYING) {
             move = AIPlayer.makeMove();
             System.out.println("Move: (" + move.x + ", " + move.y + ")");
             switch (move.moveType) {

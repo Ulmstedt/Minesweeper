@@ -1,6 +1,5 @@
 package Minesweeper.Game;
 
-import Minesweeper.Game.Enums.MoveType;
 import Minesweeper.Game.Interfaces.IAIPlayer;
 import Minesweeper.Game.Interfaces.IGameListener;
 import Minesweeper.Game.Interfaces.IObserver;

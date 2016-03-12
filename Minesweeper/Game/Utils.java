@@ -17,4 +17,14 @@ public class Utils {
         }
         return highest;
     }
+    
+    public static int[][] cloneMatrix(int[][] matrix) {
+        int[][] clonedMatrix = new int[matrix.length][];
+
+        for (int i = 0; i < matrix.length; i++) {
+            clonedMatrix[i] = matrix[i].clone();
+        }
+
+        return clonedMatrix;
+    }
 }

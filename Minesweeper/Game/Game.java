@@ -59,6 +59,8 @@ public final class Game {
     public void tick() {
         if (gameState == GameState.GAMEOVER) {
             //newGame(); //Uncomment for fast AI games
+        } else if (gameState == GameState.VICTORY) {
+            //newGame(); //Uncomment for fast AI games
         }
         Move move;
         if (AIPlayer != null && gameState == GameState.PLAYING) {
@@ -308,7 +310,7 @@ public final class Game {
     public ArrayList<IObserver> getGameObservers() {
         return gameObservers;
     }
-    
+
     public Stats getStats() {
         return stats;
     }

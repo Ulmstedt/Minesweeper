@@ -1,6 +1,12 @@
 package Minesweeper.GUI;
 
+import Minesweeper.Game.Constants.Constants;
+import Minesweeper.Game.Enums.MoveType;
+import Minesweeper.Game.Game;
 import Minesweeper.Game.GameState;
+import Minesweeper.Game.Interfaces.IGameListener;
+import Minesweeper.Game.Interfaces.IObserver;
+import Minesweeper.Game.Move;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -12,12 +18,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import Minesweeper.Game.Constants.Constants;
-import Minesweeper.Game.Game;
-import Minesweeper.Game.Interfaces.IGameListener;
 
 /**
  * The GameComponent class is a graphical representation of a Game object.
@@ -158,9 +162,14 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
             } else { //Left mouse click
                 if (!game.gameInitialized()) {
                     game.placeMines(x, y);
-
                 }
                 game.revealBlock(x, y);
+
+                //Notify observers of move
+                ArrayList<IObserver> gameObservers = game.getGameObservers();
+                for (IObserver o : gameObservers) {
+                    o.moveMade(new Move(x, y, MoveType.REVEAL));
+                }
             }
         } else {
             game.newGame();

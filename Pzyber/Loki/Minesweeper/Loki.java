@@ -115,7 +115,13 @@ public class Loki {
                             // Get available moves for current hash from loki db and add do data if move is available.
                             ArrayList<MoveData> availableMoves = lokiDB.getAvailableMovesFromDB(hash, startX, startY,
                                     searchPatternMirror == 1, searchPatternRotation, searchWidth);
-                            data.addAll(availableMoves.stream().collect(Collectors.toList()));
+                            for(MoveData move : availableMoves)
+                            {
+                                if(move.thoughtResult() >= 0.5){
+                                    data.add(move);
+                                }
+                            }
+                            //data.addAll(availableMoves.stream().collect(Collectors.toList()));
 
                             startX++;
                             endX++;

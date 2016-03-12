@@ -27,7 +27,6 @@ import Pzyber.Loki.Minesweeper.Utils;
 
 import java.awt.*;
 import java.net.InetAddress;
-import java.util.Random;
 
 public class AILoki implements IAIPlayer, IObserver {
 
@@ -35,28 +34,28 @@ public class AILoki implements IAIPlayer, IObserver {
     private Game game;
 
     // Memory DB
-    public AILoki(Game game) {
+    public AILoki(Game game, int searchWidth) {
         this.game = game;
-        loki = new Loki(game.getWidth(), game.getHeight());
+        loki = new Loki(game.getWidth(), game.getHeight(), searchWidth);
     }
 
     // Folder DB
-    public AILoki(Game game, String folderPath) {
+    public AILoki(Game game, String folderPath, int searchWidth) {
         this.game = game;
-        loki = new Loki(folderPath, game.getWidth(), game.getHeight());
+        loki = new Loki(folderPath, game.getWidth(), game.getHeight(), searchWidth);
     }
 
     // File DB
-    public AILoki(Game game, String folderPath, String filename) {
+    public AILoki(Game game, String folderPath, String filename, int searchWidth) {
         this.game = game;
-        loki = new Loki(folderPath, filename, game.getWidth(), game.getHeight());
+        loki = new Loki(folderPath, filename, game.getWidth(), game.getHeight(), searchWidth);
     }
 
     // SQL DB
     public AILoki(Game game, InetAddress address, int port, String database,
-                  String username, String password) {
+                  String username, String password, int searchWidth) {
         this.game = game;
-        loki = new Loki(address, port, database, username, password, game.getWidth(), game.getHeight());
+        loki = new Loki(address, port, database, username, password, game.getWidth(), game.getHeight(), searchWidth);
     }
 
     @Override

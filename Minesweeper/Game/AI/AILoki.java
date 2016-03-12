@@ -32,37 +32,53 @@ public class AILoki implements IAIPlayer, IObserver {
 
     private Loki loki;
     private Game game;
+    private int[][] pointGrid;
 
     // Memory DB
     public AILoki(Game game, int searchWidth) {
         this.game = game;
+        pointGrid = new int[game.getHeight()][game.getWidth()];
         loki = new Loki(game.getWidth(), game.getHeight(), searchWidth);
     }
 
     // Folder DB
     public AILoki(Game game, String folderPath, int searchWidth) {
         this.game = game;
+        pointGrid = new int[game.getHeight()][game.getWidth()];
         loki = new Loki(folderPath, game.getWidth(), game.getHeight(), searchWidth);
     }
 
     // File DB
     public AILoki(Game game, String folderPath, String filename, int searchWidth) {
         this.game = game;
+        pointGrid = new int[game.getHeight()][game.getWidth()];
         loki = new Loki(folderPath, filename, game.getWidth(), game.getHeight(), searchWidth);
     }
 
     // SQL DB
-    public AILoki(Game game, InetAddress address, int port, String database,
-                  String username, String password, int searchWidth) {
+    public AILoki(Game game, InetAddress address, int port, String database, String username, String password,
+                  int searchWidth) {
         this.game = game;
+        pointGrid = new int[game.getHeight()][game.getWidth()];
         loki = new Loki(address, port, database, username, password, game.getWidth(), game.getHeight(), searchWidth);
     }
 
     @Override
     public Move makeMove() {
+        // Get move.
         LokiResult lr = loki.thinkOfAMove(Utils.changeToYXBoard(game.getRevealed()));
+
+        // Get pointGrid.
+        //pointGrid = Utils.cloneMatrix(Utils.changeToYXBoard(lr.getCalculatedDataRoundedScaled(999999)));
+
+        // Play move.
         Point move = lr.getMove();
         return new Move(move.x, move.y, MoveType.REVEAL);
+    }
+
+    @Override
+    public int[][] getPointGrid() {
+        return new int[game.getWidth()][game.getHeight()];
     }
 
     @Override

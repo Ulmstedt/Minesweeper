@@ -38,4 +38,9 @@ public class AIRandom implements IAIPlayer{
         System.out.println("Move made " + p.x + " : " + p.y);
         return new Move(p.x, p.y, MoveType.REVEAL);
     }
+
+    @Override
+    public int[][] getPointGrid() {
+        return new int[0][];
+    }
 }

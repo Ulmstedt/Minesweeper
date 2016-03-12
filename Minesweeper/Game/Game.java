@@ -34,7 +34,7 @@ public final class Game {
     private boolean gameInitialized;
 
     public final int DEBUG_LEVEL = 2; // 0 = off, 1 = show heatmap, 2 = show heatmap + scores
-    public final boolean FILE_STATS = true;
+    public final boolean FILE_STATS = false;
 
     public Game(int width, int height, int numberOfMines) {
         this.gameListeners = new ArrayList<>();
@@ -49,7 +49,8 @@ public final class Game {
         gameObservers = new ArrayList<>();
         this.stats = new Stats(50, FILE_STATS);
         //Set this to AI object if AI is used, otherwise null
-        AIPlayer = new TestAI(this);
+        //AIPlayer = new TestAI(this);
+        AIPlayer = null;
 
         newGame();
     }
@@ -121,7 +122,7 @@ public final class Game {
             int y = ThreadLocalRandom.current().nextInt(0, height);
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
-                    if (x + dx < 0 || y + dy < 0 || x + dx >= width || y + dy >= height || (x + dx == startx && y + dy == starty) || board[x][y] != 0) {
+                    if ((x + dx == startx && y + dy == starty) || board[x][y] != 0) {
                         continue outer;
                     }
                 }

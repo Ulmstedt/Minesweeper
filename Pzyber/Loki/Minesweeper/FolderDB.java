@@ -28,13 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FolderDB implements ILokiDB {
-
-    public static final byte DRAW = 0;
-    public static final byte LOSS = 1;
-    public static final byte WIN = 2;
-    public static final byte DRAWS = 0;
-    public static final byte LOSSES = 1;
-    public static final byte WINS = 2;
+    public static final boolean LOSS = false;
+    public static final boolean WIN = true;
+    public static final byte LOSSES = 0;
+    public static final byte WINS = 1;
 
     private String path;
 
@@ -45,7 +42,7 @@ public class FolderDB implements ILokiDB {
     }
 
     @Override
-    public void addToDB(String hash, Point move, byte result) {
+    public void addToDB(String hash, Point move, boolean result) {
         String filePath = path + "/" + hash + "/" + move.x + "_" + move.y + ".txt";
         if (Files.exists(Paths.get(path + "/" + hash))) {
             if (Files.exists(Paths.get(filePath))) {
@@ -53,16 +50,16 @@ public class FolderDB implements ILokiDB {
                 long[] dbData = readDataFromDBFile(filePath);
 
                 // Write data to file.
-                writeDataToDBFile(filePath, result, dbData[DRAWS], dbData[LOSSES], dbData[WINS]);
+                writeDataToDBFile(filePath, result, dbData[LOSSES], dbData[WINS]);
             } else {
                 // Write data to file.
-                writeDataToDBFile(filePath, result, 0, 0, 0);
+                writeDataToDBFile(filePath, result, 0, 0);
             }
         } else {
             // Create hashed folder and write data to file..
             File hashedFolder = new File(path + "/" + hash);
             if (hashedFolder.mkdirs()) {
-                writeDataToDBFile(filePath, result, 0, 0, 0);
+                writeDataToDBFile(filePath, result, 0, 0);
             }
         }
     }
@@ -96,7 +93,7 @@ public class FolderDB implements ILokiDB {
                     long[] dbData = readDataFromDBFile(baseHashPath + "/" + m);
 
                     // Add to available moves.
-                    availableMoves.add(new MoveData(move, dbData[DRAWS], dbData[LOSSES], dbData[WINS]));
+                    availableMoves.add(new MoveData(move, dbData[LOSSES], dbData[WINS]));
                 }
             }
         }
@@ -109,25 +106,22 @@ public class FolderDB implements ILokiDB {
         long dbData[] = {0, 0, 0};
         try {
             List<String> rows = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
-            dbData[DRAWS] = Long.parseLong(rows.get(DRAWS));
             dbData[LOSSES] = Long.parseLong(rows.get(LOSSES));
             dbData[WINS] = Long.parseLong(rows.get(WINS));
 
         } catch (IOException ignored) {
         }
 
-        return new long[]{dbData[DRAWS], dbData[LOSSES], dbData[WINS]};
+        return new long[]{dbData[LOSSES], dbData[WINS]};
     }
 
     // Write data to file.
-    private void writeDataToDBFile(String path, byte result, long previousDraws, long previousLosses,
+    private void writeDataToDBFile(String path, boolean result, long previousLosses,
                                    long previousWins) {
         try {
             FileWriter fw = new FileWriter(path, false);
             BufferedWriter bw = new BufferedWriter(fw);
 
-            bw.write(Long.toString((result == DRAW ? 1 : 0) + previousDraws));    // Draw.
-            bw.newLine();
             bw.write(Long.toString((result == LOSS ? 1 : 0) + previousLosses));   // Losses.
             bw.newLine();
             bw.write(Long.toString((result == WIN ? 1 : 0) + previousWins));   // Wins.

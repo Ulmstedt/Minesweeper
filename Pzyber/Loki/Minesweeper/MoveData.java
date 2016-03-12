@@ -19,20 +19,13 @@ package Pzyber.Loki.Minesweeper;
 import java.awt.Point;
 
 public class MoveData {
-    protected static boolean aggressive = false;
-
-    private long draws, losses, wins;
+    private long losses, wins;
     private Point move;
 
-    public MoveData(Point move, long draws, long losses, long wins) {
+    public MoveData(Point move, long losses, long wins) {
         this.move = move;
-        this.draws = draws;
         this.losses = losses;
         this.wins = wins;
-    }
-
-    public void addDraws(long amount) {
-        draws += amount;
     }
 
     public void addLosses(long amount) {
@@ -44,15 +37,8 @@ public class MoveData {
     }
 
     public float thoughtResult() {
-        long total = draws + losses + wins;
-        if (aggressive) {
-            return (float) wins / (float) total;
-        }
-        return ((float) draws + (float) wins) / (float) total;
-    }
-
-    public long getDraws() {
-        return draws;
+        long total = losses + wins;
+        return (float) wins / (float) total;
     }
 
     public long getLosses() {

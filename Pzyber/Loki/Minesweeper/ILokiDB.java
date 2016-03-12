@@ -20,7 +20,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 public interface ILokiDB {
-    void addToDB(String hash, Point move, byte result);
+    void addToDB(String hash, Point move, boolean result);
 
     void addToDBDone();
 

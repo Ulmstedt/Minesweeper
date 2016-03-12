@@ -19,14 +19,12 @@ package Pzyber.Loki.Minesweeper;
 import java.awt.Point;
 
 public class GameData {
-    private int id;
     private int[][] board;
     private Point move;
 
-    public GameData(int[][] board, Point move, int id) {
+    public GameData(int[][] board, Point move) {
         this.board = board;
         this.move = move;
-        this.id = id;
     }
 
     public int[][] getBoard() {
@@ -35,9 +33,5 @@ public class GameData {
 
     public Point getMove() {
         return new Point(move.x, move.y);
-    }
-
-    public int getID() {
-        return id;
     }
 }

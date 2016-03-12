@@ -10,7 +10,7 @@
  *
  * Licenced under GNU GPLv3.
  * http://www.gnu.org/licenses/gpl-3.0.html
- *2
+ *
  * If you have questions, contact me at pzyber@pzyber.net
  */
 
@@ -28,11 +28,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Loki {
-    public static final byte DRAW = 0;
-    public static final byte LOSS = 1;
-    public static final byte WIN = 2;
-    public static final int NO_ID_FLIP = 0;
-
     private int[][] previousBoard;
     private int size;
     private int width, height;
@@ -41,23 +36,21 @@ public class Loki {
     private Random random = new Random();
 
     // Memory DB.
-    public Loki(int width, int height, boolean aggressive) {
+    public Loki(int width, int height) {
         size = width <= height ? width : height;
         this.width = width;
         this.height = height;
-        MoveData.aggressive = aggressive;
-        previousBoard = new int[height][width];
+        previousBoard = Utils.initNewBoard(width, height);
 
         lokiDB = new MemoryDB();
     }
 
     // Folder DB.
-    public Loki(String folderPath, int width, int height, boolean aggressive) {
+    public Loki(String folderPath, int width, int height) {
         size = width <= height ? width : height;
         this.width = width;
         this.height = height;
-        MoveData.aggressive = aggressive;
-        previousBoard = new int[height][width];
+        previousBoard = Utils.initNewBoard(width, height);
 
         try {
             lokiDB = new FolderDB(folderPath);
@@ -67,12 +60,11 @@ public class Loki {
     }
 
     // File DB.
-    public Loki(String folderPath, String filename, int width, int height, boolean aggressive) {
+    public Loki(String folderPath, String filename, int width, int height) {
         size = width <= height ? width : height;
         this.width = width;
         this.height = height;
-        MoveData.aggressive = aggressive;
-        previousBoard = new int[height][width];
+        previousBoard = Utils.initNewBoard(width, height);
 
         try {
             lokiDB = new FileDB(folderPath, filename);
@@ -82,13 +74,12 @@ public class Loki {
     }
 
     // SQL DB.
-    public Loki(InetAddress address, int port, String database, String username, String password, int width, int height,
-                boolean aggressive) {
+    public Loki(InetAddress address, int port, String database, String username, String password, int width,
+                int height) {
         size = width <= height ? width : height;
         this.width = width;
         this.height = height;
-        MoveData.aggressive = aggressive;
-        previousBoard = new int[height][width];
+        previousBoard = Utils.initNewBoard(width, height);
 
         try {
             lokiDB = new SQLDB(address, port, database, username, password);
@@ -97,11 +88,10 @@ public class Loki {
         }
     }
 
-    private ArrayList<MoveData> getMovesFromDB(int[][] board, int id, int searchWidth) {
+    private ArrayList<MoveData> getMovesFromDB(int[][] board, int searchWidth) {
         ArrayList<MoveData> data = new ArrayList<>();
 
         // Search for patterns in DB.
-        for (int idFlip = 0; idFlip < 2; idFlip++) { // Flip id loop.
             for (int searchPatternMirror = 0; searchPatternMirror < 2; searchPatternMirror++) { // Mirror search pattern loop.
                 for (int searchPatternRotation = 0; searchPatternRotation < 4; searchPatternRotation++) { // Rotate search pattern loop.
                     int startX = 0;
@@ -120,7 +110,7 @@ public class Loki {
                             }
 
                             // Calculate hash.
-                            String hash = Utils.calculateHash(searchPattern, idFlip, id);
+                            String hash = Utils.calculateHash(searchPattern);
 
                             // Get available moves for current hash from loki db and add do data if move is available.
                             ArrayList<MoveData> availableMoves = lokiDB.getAvailableMovesFromDB(hash, startX, startY,
@@ -137,38 +127,27 @@ public class Loki {
                         endY++;
                     }
                 }
-            }
         }
 
         return data;
     }
 
-    public void registerMoveInDB(int[][] board) {
+    public void registerMoveInDB(int[][] board, Point move) {
         // Clone board.
         int[][] clonedBoard = Utils.cloneMatrix(board);
 
-        // Get move by doing a board comparison.
-        Point move = Utils.getMoveByBoardComparison(previousBoard, clonedBoard);
-
-        // Get player ID.
-        int id = clonedBoard[move.y][move.x];
+        // Store previous board and the new move.
+        gameData.add(new GameData(previousBoard, move));
 
         // Update previous board to equal current.
-        previousBoard[move.y][move.x] = id;
-
-        // Reverse recent move.
-        clonedBoard[move.y][move.x] = 0;
-
-        // Store previous board and the new move.
-        gameData.add(new GameData(clonedBoard, move, id));
+        previousBoard = clonedBoard;
     }
 
-    private void storeMovesInDB(GameData gd, int winnerID, int searchWidth) {
+    private void storeMovesInDB(GameData gd, boolean win, int searchWidth) {
         int[][] board = gd.getBoard();
         Point move = gd.getMove();
-        int id = gd.getID();
 
-        // TODO: Search if exists with flips (will reduce data storage by factor 16).
+        // TODO: Search if exists (will reduce data storage).
 
         int startX = 0;
         int endX = searchWidth - 1;
@@ -180,13 +159,13 @@ public class Loki {
                         move.x >= startX && move.x <= endX && move.y >= startY && move.y <= endY) {
                     // Get search pattern and calculate hash.
                     int[][] searchPattern = Utils.getSearchPattern(board, startX, startY, endX, endY);
-                    String hash = Utils.calculateHash(searchPattern, NO_ID_FLIP, id);
+                    String hash = Utils.calculateHash(searchPattern);
 
                     // Descale move to board.
                     Point descaledMove = new Point(move.x - startX, move.y - startY);
 
                     // Store data to database.
-                    lokiDB.addToDB(hash, descaledMove, winnerID == DRAW ? DRAW : (winnerID == id ? WIN : LOSS));
+                    lokiDB.addToDB(hash, descaledMove, win);
                 }
 
                 startX++;
@@ -201,7 +180,7 @@ public class Loki {
     }
 
     // The actual learning mechanism. Requires that all moves are registered with registerMoveInDB.
-    public void storeRegisteredMovesInDB(int winnerID) {
+    public void storeRegisteredMovesInDB(boolean win) {
         // Start time of start of storing process.
         System.out.println("Loki: Storing game data in DB...");
         long startTime = System.currentTimeMillis();
@@ -210,14 +189,14 @@ public class Loki {
         for (GameData gd : gameData) {
             int searchWidth = size;
             while (searchWidth > 1) {
-                storeMovesInDB(gd, winnerID, searchWidth);
+                storeMovesInDB(gd, win, searchWidth);
 
                 searchWidth--;
             }
         }
 
         // Clear previous board and all registered move data.
-        previousBoard = new int[height][width];
+        previousBoard = Utils.initNewBoard(width, height);
         gameData.clear();
 
         // Signal DB that all data has been stored.
@@ -229,7 +208,7 @@ public class Loki {
         System.out.println("Loki: Game data stored in " + timeSpent + " ms.");
     }
 
-    public LokiResult thinkOfAMove(int[][] board, int id) {
+    public LokiResult thinkOfAMove(int[][] board) {
         // Start time of AI's turn.
         System.out.println("Loki: Thinking out a move...");
         long startTime = System.currentTimeMillis();
@@ -245,7 +224,7 @@ public class Loki {
         while (!positiveSearchResultFound && searchWidth > 1) {
             // Clone board and consider a move.
             int[][] clonedBoard = Utils.cloneMatrix(board);
-            resultData = getMovesFromDB(clonedBoard, id, searchWidth);
+            resultData = getMovesFromDB(clonedBoard, searchWidth);
 
             if (resultData != null) {
                 // Go through result data and add to data.
@@ -254,7 +233,6 @@ public class Loki {
                     if (data.containsKey(move)) {
                         MoveData existingMoveData = data.get(move);
 
-                        existingMoveData.addDraws(md.getDraws());
                         existingMoveData.addLosses(md.getLosses());
                         existingMoveData.addWins(md.getWins());
                     } else {
@@ -289,7 +267,7 @@ public class Loki {
                 thoughtData[y][x] = thoughtResult;
 
                 // Check if better move.
-                if (board[y][x] == 0) {
+                if (board[y][x] == -1) {
                     if (thoughtResult > bestThoughtResult) {
                         bestThoughtResult = thoughtResult;
                         bestMoves.clear();

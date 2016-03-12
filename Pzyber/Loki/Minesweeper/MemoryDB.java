@@ -22,12 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryDB implements ILokiDB {
-    public static final byte DRAW = 0;
-    public static final byte LOSS = 1;
-    public static final byte WIN = 2;
-    public static final byte DRAWS = 0;
-    public static final byte LOSSES = 1;
-    public static final byte WINS = 2;
+    public static final boolean LOSS = false;
+    public static final boolean WIN = true;
+    public static final byte LOSSES = 0;
+    public static final byte WINS = 1;
 
     private Map<String, Map<Point, long[]>> db;
 
@@ -36,7 +34,7 @@ public class MemoryDB implements ILokiDB {
     }
 
     @Override
-    public void addToDB(String hash, Point move, byte result) {
+    public void addToDB(String hash, Point move, boolean result) {
         if (db.containsKey(hash)) {
             // Get inner database.
             Map<Point, long[]> dbInner = db.get(hash);
@@ -44,7 +42,6 @@ public class MemoryDB implements ILokiDB {
             if (dbInner.containsKey(move)) {
                 // Get draws, losses and wins.
                 long[] dbData = dbInner.get(move);
-                dbData[DRAWS] = dbData[DRAWS] + (result == DRAW ? 1 : 0);
                 dbData[LOSSES] = dbData[LOSSES] + (result == LOSS ? 1 : 0);
                 dbData[WINS] = dbData[WINS] + (result == WIN ? 1 : 0);
 
@@ -53,16 +50,14 @@ public class MemoryDB implements ILokiDB {
                 dbInner.put(move, dbData);
             } else {
                 // Set draws, losses and wins.
-                long[] dbData = new long[]{(result == DRAW ? +1 : 0), (result == LOSS ? +1 : 0),
-                        (result == WIN ? 1 : 0)};
+                long[] dbData = new long[]{(result == LOSS ? +1 : 0), (result == WIN ? 1 : 0)};
 
                 // Store stats.
                 dbInner.put(move, dbData);
             }
         } else {
             // Set draws, losses and wins.
-            long[] dbData = new long[]{(result == DRAW ? +1 : 0), (result == LOSS ? +1 : 0),
-                    (result == WIN ? 1 : 0)};
+            long[] dbData = new long[]{(result == LOSS ? +1 : 0), (result == WIN ? 1 : 0)};
 
             // Create inner database.
             Map<Point, long[]> dbInner = new HashMap<>();
@@ -98,7 +93,7 @@ public class MemoryDB implements ILokiDB {
                 move = Utils.scaleMirrorAndRotate(move, startX, startY, mirror, rotations, size);
 
                 // Add to available moves.
-                availableMoves.add(new MoveData(move, dbData[DRAWS], dbData[LOSSES], dbData[WINS]));
+                availableMoves.add(new MoveData(move, dbData[LOSSES], dbData[WINS]));
             }
         }
 

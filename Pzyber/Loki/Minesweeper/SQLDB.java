@@ -22,12 +22,10 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class SQLDB implements ILokiDB {
-    public static final byte DRAW = 0;
-    public static final byte LOSS = 1;
-    public static final byte WIN = 2;
-    public static final byte DRAWS = 0;
-    public static final byte LOSSES = 1;
-    public static final byte WINS = 2;
+    public static final boolean LOSS = false;
+    public static final boolean WIN = true;
+    public static final byte LOSSES = 0;
+    public static final byte WINS = 1;
 
     private Statement stmt;
 
@@ -40,7 +38,7 @@ public class SQLDB implements ILokiDB {
     }
 
     @Override
-    public void addToDB(String hash, Point move, byte result) {
+    public void addToDB(String hash, Point move, boolean result) {
         if (hashAndMoveExistsInDB(hash, move)) {
             try {
                 // Get draws, losses and wins.
@@ -49,14 +47,13 @@ public class SQLDB implements ILokiDB {
                         "' AND Y = '" + move.y + "';";
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
-                    dbData[DRAWS] = rs.getLong("Draws") + (result == DRAW ? 1 : 0);
                     dbData[LOSSES] = rs.getLong("Losses") + (result == LOSS ? 1 : 0);
                     dbData[WINS] = rs.getLong("Wins") + (result == WIN ? 1 : 0);
                 }
 
                 // Update data.
-                stmt.executeUpdate("UPDATE data SET Draws = '" + dbData[DRAWS] + "', Losses = '" + dbData[LOSSES] +
-                        "', Wins = '" + dbData[WINS] + "' WHERE Hash = '" + hash + "' AND X = '" + move.x + "'" +
+                stmt.executeUpdate("UPDATE data SET Losses = '" + dbData[LOSSES] + "', Wins = '" + dbData[WINS] +
+                        "' WHERE Hash = '" + hash + "' AND X = '" + move.x + "'" +
                         " AND Y = '" + move.y + "';");
             } catch (SQLException ignored) {
             }
@@ -64,7 +61,7 @@ public class SQLDB implements ILokiDB {
             // Insert data.
             try {
                 stmt.executeUpdate("INSERT INTO data VALUES ('" + hash + "', '" + move.x + "', '" + move.y + "'," +
-                        " '" + (result == DRAW ? 1 : 0) + "', '" + (result == LOSS ? 1 : 0) + "', '" +
+                        " ', '" + (result == LOSS ? 1 : 0) + "', '" +
                         (result == WIN ? 1 : 0) + "');");
             } catch (SQLException ignored) {
             }
@@ -108,7 +105,7 @@ public class SQLDB implements ILokiDB {
                 long dbData[] = {rs.getLong("Draws"), rs.getLong("Losses"), rs.getLong("Wins")};
 
                 // Add to available moves.
-                availableMoves.add(new MoveData(move, dbData[DRAWS], dbData[LOSSES], dbData[WINS]));
+                availableMoves.add(new MoveData(move, dbData[LOSSES], dbData[WINS]));
             }
         } catch (SQLException ignored) {
         }

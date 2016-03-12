@@ -21,10 +21,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Utils {
-    public static String calculateHash(int[][] searchPattern, int flipIDBy, int id) {
+    public static String calculateHash(int[][] searchPattern) {
         // Get search pattern as String.
-        String stringboard = getSearchPatternAsString(searchPattern, flipIDBy);
-        stringboard += getSearchPatternIDMatchAsString(searchPattern, id);
+        String stringboard = getSearchPatternAsString(searchPattern);
 
         // Calculate and return SHA hash.
         try {
@@ -84,39 +83,12 @@ public class Utils {
         return searchPattern;
     }
 
-    public static String getSearchPatternAsString(int[][] searchPattern, int flipIDBy) {
+    public static String getSearchPatternAsString(int[][] searchPattern) {
         String result = "";
 
         for (int y = 0; y < searchPattern.length; y++) {
             for (int x = 0; x < searchPattern[0].length; x++) {
-                int value = searchPattern[y][x];
-
-                // Flipp id.
-                if (value > 0 && flipIDBy > 0) {
-                    value += flipIDBy;
-                    if (value > 2) {
-                        value = value - 2;
-                    }
-                }
-
-                result += Integer.toString(value);
-            }
-        }
-
-        return result;
-    }
-
-    public static String getSearchPatternIDMatchAsString(int[][] searchPattern, int id) {
-        String result = "";
-
-        for (int y = 0; y < searchPattern.length; y++) {
-            for (int x = 0; x < searchPattern[0].length; x++) {
-                if(searchPattern[y][x] == id) {
-                    result += Integer.toString(3);
-                }
-                else{
-                    result += Integer.toString(0);
-                }
+                result += Integer.toString(searchPattern[y][x]);
             }
         }
 
@@ -146,6 +118,16 @@ public class Utils {
             }
         }
         return value > 0;
+    }
+
+    public static int[][] initNewBoard(int width, int height){
+        int[][] newBoard = new int[width][height];
+
+        for (int y = 0; y < width; y++) {
+            for (int x = 0; x < height; x++) {
+                newBoard[y][x] = -1;
+            }
+        }
     }
 
     public static Point mirrorMoveVertically(Point move, int size) {

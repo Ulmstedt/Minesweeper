@@ -7,6 +7,6 @@ package Minesweeper.Game.Constants;
 public class Constants {
     public static int SQUARE_SIZE = 40;
     public static int PADDING_TOP = 0;
-    public static int PADDING_BOTTOM = 0;
+    public static int PADDING_BOTTOM = 20;
     public static int LINE_THICKNESS = 2;
 }

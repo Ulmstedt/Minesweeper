@@ -7,6 +7,7 @@ import Minesweeper.Game.GameState;
 import Minesweeper.Game.Interfaces.IGameListener;
 import Minesweeper.Game.Interfaces.IObserver;
 import Minesweeper.Game.Move;
+import Minesweeper.Game.Stats;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -126,6 +127,32 @@ public class GameComponent extends JComponent implements IGameListener, MouseLis
                 }
             }
         }
+
+        //Draw scores and stats
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(new Font("Serif", Font.BOLD, 14));
+        Stats stats = game.getStats();
+        //Total
+        int wins = stats.getTotalWins();
+        int losses = stats.getTotalLosses();
+        double winPercentTotal = ((wins + losses) == 0 ? 0 : ((double) wins / (wins + losses)) * 100);
+        double lossPercentTotal = ((wins + losses) == 0 ? 0 : ((double) losses / (wins + losses)) * 100);
+        String winPercentTotalString = String.format("%.1f", winPercentTotal);
+        String lossPercentTotalString = String.format("%.1f", lossPercentTotal);
+        String winStringTotal = "Wins: " + wins + " (" + winPercentTotalString + "%)";
+        String lossStringTotal = "Losses: " + losses + " (" + lossPercentTotalString + "%)";
+
+        //Recent
+        int recentWins = (stats.getWinnerCount().get(1) == null ? 0 : stats.getWinnerCount().get(1));
+        int recentLosses = (stats.getWinnerCount().get(2) == null ? 0 : stats.getWinnerCount().get(2));
+        double recentWinPercent = ((recentWins + recentLosses) == 0 ? 0 : ((double) recentWins / (recentWins + recentLosses)) * 100);
+        double recentLossPercent = ((recentWins + recentLosses) == 0 ? 0 : ((double) recentLosses / (recentWins + recentLosses)) * 100);
+        String recentWinPercentString = String.format("%.1f", recentWinPercent);
+        String recentLossPercentString = String.format("%.1f", recentLossPercent);
+        String recentWinString = "Wins: " + recentWins + " (" + recentWinPercentString + "%)";
+        String recentLossString = "Losses: " + recentLosses + " (" + recentLossPercentString + "%)";
+
+        g2d.drawString("Total:  " + winStringTotal + " / " + lossStringTotal + "  |  Last " + stats.getHistoryLength() + " games:  " + recentWinString + " / " + recentLossString, 3, height - 5);
 
         if (game.getGameState() == GameState.GAMEOVER) {
             g2d.setColor(new Color(0f, 0f, 0f, 0.4f));
